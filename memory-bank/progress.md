@@ -26,19 +26,18 @@ This document tracks the progress of the `gemini-mcp-go` implementation.
 -   [x] Implement `handleInitialize`
 -   [x] Implement `handleGenerate`
 -   [x] Implement `handleStream`
--   [ ] Implement `handleCancel`
+-   [x] Implement `handleCancel` (by handling context cancellation in `handleStream`)
 
 ## Phase 5: Comprehensive Testing
 
--   [x] Set up `go-vcr` for API mocking
 -   [x] Write tests for `handleGenerate`
--   [ ] Write tests for `handleStream`
--   [ ] Write tests for `handleCancel`
+-   [x] Write tests for `handleStream`
+-   [x] Write tests for `handleCancel`
 -   [ ] Achieve high test coverage
 
 ## Phase 6: Configuration & Final Touches
 
--   [ ] Implement configuration loading (env vars, flags)
--   [ ] Implement `cmd/setup.go`
--   [ ] Write `README.md`
--   [ ] Final review and cleanup
+-   [x] Implement configuration loading (env vars, flags)
+-   [x] Implement `cmd/setup.go`
+-   [x] Write `README.md`
+-   [x] Final review and cleanup

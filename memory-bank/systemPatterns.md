@@ -18,8 +18,7 @@ graph TD
     F -- Stdin/Stdout --> H[AI Assistant]
 
     subgraph "Testing"
-        I[Tests] -- Uses --> J[go-vcr]
-        J -- Records/Replays --> G
+        I[Tests] --> G
         I -- Compares against --> K[Golden Files]
     end
 ```
@@ -47,10 +46,6 @@ graph TD
     -   It will handle API authentication, request formatting, and response parsing.
     -   This isolation is crucial for mocking the API during testing.
 
-### 3. Test-Driven Development (TDD) with API Mocking
-
--   **`go-vcr`:** We will use `go-vcr` to record real HTTP interactions with the Gemini API and save them as "cassettes" in the `testdata/fixtures/` directory.
--   **Offline Testing:** Subsequent test runs will use these cassettes to replay the recorded responses, eliminating the need for a live API connection. This makes tests fast, deterministic, and independent of network conditions.
 -   **Golden Files:** For each test case, the expected output will be stored in a `.golden` file in `testdata/golden/`. Tests will compare the actual output against these golden files to ensure correctness.
 -   **Test Structure:** Tests will be placed alongside the code they are testing (e.g., `pkg/handlers/generate_test.go`).
 
