@@ -2,18 +2,16 @@
 
 ## Current Focus
 
-The current focus is on **Phase 6: Configuration & Final Touches**.
+The current focus is on ensuring the `setup` command in `cmd/setup.go` uses the correct, up-to-date configuration paths for all supported AI assistant tools.
 
 ## Recent Changes
 
--   Updated the project to use `mcp-go v0.32.0`.
--   Refactored `pkg/server/server.go` and `pkg/handlers/handlers.go` to use the new `mcp-go` API.
--   Implemented configuration loading (env vars, flags) in `cmd/serve.go`.
--   Reviewed and updated `cmd/setup.go`.
--   Updated `memory-bank/progress.md` to reflect the current state of the project.
--   Ensured that the `GEMINI_API_KEY` environment variable is required and the server fails if it is not set.
+- Updated the `setup` command in `cmd/setup.go` to use the correct configuration paths for `cline`, `roo-code`, and `claude-code`.
+- Implemented the `setupRooCode` function, which was previously a placeholder.
+- The configuration paths were copied from a similar implementation in `context/linear-mcp-go/cmd/setup.go`.
 
 ## Next Steps
 
-1.  Final review and cleanup.
-2.  (Optional) Implement the remaining tests: Write tests for the `handleCancel` handler and achieve high test coverage.
+1.  Update `progress.md` to reflect the completion of the configuration path updates.
+2.  Review the changes to ensure they are correct and complete.
+3.  Run the test suite to ensure that the changes have not introduced any regressions.
