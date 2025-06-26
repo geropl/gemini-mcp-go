@@ -33,11 +33,13 @@ This document tracks the progress of the `gemini-mcp-go` implementation.
 -   [x] Write tests for `handleGenerate`
 -   [x] Write tests for `handleStream`
 -   [x] Write tests for `handleCancel`
+-   [x] Write tests for `setup` command
 -   [ ] Achieve high test coverage
 
 ## Phase 6: Configuration & Final Touches
 
 -   [x] Implement configuration loading (env vars, flags)
 -   [x] Implement `cmd/setup.go`
+-   [x] Update `cmd/setup.go` with correct configuration paths
 -   [x] Write `README.md`
--   [x] Final review and cleanup
+-   [ ] Final review and cleanup
