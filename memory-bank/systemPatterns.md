@@ -54,4 +54,10 @@ graph TD
 -   **Environment Variables:** Sensitive information like the `GEMINI_API_KEY` will be loaded from the environment.
 -   **Command-Line Flags:** Non-sensitive configuration options will be exposed as flags on the `serve` and `setup` commands.
 
+### 5. CI/CD with GitHub Actions
+
+-   **Workflow Automation:** The project uses GitHub Actions to automate the build, test, and release process.
+-   **Continuous Integration:** Every push to `main` or pull request triggers a workflow that builds the application and runs the test suite.
+-   **Automated Releases:** When a version tag (e.g., `v1.0.1`) is pushed, the workflow automatically builds binaries for Linux, macOS, and Windows, and creates a new GitHub release with these binaries as attachments.
+
 This architecture provides a solid foundation for building a high-quality, production-ready MCP server.

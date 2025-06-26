@@ -16,7 +16,7 @@
 
 -   **Go Toolchain:** Standard Go tools (`go build`, `go test`, `go mod`) will be used for building, testing, and managing dependencies.
 -   **Git & GitHub:** The project will be managed using Git for version control and hosted on GitHub for collaboration and CI/CD.
--   **GitHub Actions:** We will set up GitHub Actions for continuous integration to automatically run tests on every push and pull request.
+-   **GitHub Actions:** We will set up GitHub Actions for continuous integration to automatically run tests on every push and pull request. The same workflow will also handle automated releases when a version tag is pushed.
 
 ## Configuration
 

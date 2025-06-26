@@ -44,3 +44,24 @@ To run the tests, use the following command:
 
 ```bash
 go test ./...
+```
+
+## Release Process
+
+The project uses GitHub Actions for automated testing and releases:
+
+1. All pushes to the main branch and pull requests are automatically tested.
+2. When a tag matching the pattern `v*` (e.g., `v1.0.0`) is pushed, a new release is automatically created.
+3. Binaries for Linux, macOS, and Windows are built and attached to the release.
+
+To create a new release:
+
+1. Update the version in the source code (if applicable).
+2. Commit the changes.
+3. Create and push a tag matching the version:
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+The GitHub Actions workflow will automatically create a release with the appropriate binaries.
