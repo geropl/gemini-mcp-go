@@ -6,6 +6,8 @@ toolchain go1.23.10
 
 require (
 	github.com/google/generative-ai-go v0.15.0
+	github.com/google/go-cmp v0.7.0
+	github.com/google/uuid v1.6.0
 	github.com/mark3labs/mcp-go v0.32.0
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.9.0
@@ -25,9 +27,7 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
-	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/s2a-go v0.1.7 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
 	github.com/googleapis/gax-go/v2 v2.12.4 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect

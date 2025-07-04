@@ -9,8 +9,11 @@ graph TD
     subgraph "gemini-mcp-go"
         A[main.go] --> B[cmd/serve.go]
         B --> C{Server (pkg/server)}
+        C -- Manages --> SM{Session Manager (pkg/session)}
         C -- MCP Requests --> D{Handlers (pkg/handlers)}
-        D -- Gemini API Calls --> E{Gemini Client (pkg/gemini)}
+        D -- Uses --> SM
+        SM -- Manages --> S[Sessions]
+        SM -- Gemini API Calls --> E{Gemini Client (pkg/gemini)}
         C -- Manages --> F[mcp-go library]
     end
 
@@ -41,10 +44,10 @@ graph TD
 -   **`pkg/handlers`:** This package will implement the business logic for each MCP method.
     -   Each handler (e.g., `handleGenerate`, `handleStream`) will be responsible for a single MCP method.
     -   Handlers will be stateless and receive all necessary context from the `Server`.
--   **`pkg/gemini`:** This package will act as a client wrapper for the Google Gemini API.
-    -   It will abstract away the details of the `generative-ai-go` library.
-    -   It will handle API authentication, request formatting, and response parsing.
-    -   This isolation is crucial for mocking the API during testing.
+-   **`pkg/session`:** This package contains the logic for managing stateful conversations.
+    -   The `Manager` struct handles session creation, cleanup, and file processing.
+    -   The `Session` struct holds the state for a single conversation, including the chat history and uploaded files.
+    -   It abstracts away the details of the `generative-ai-go` library for chat and file management.
 
 -   **Golden Files:** For each test case, the expected output will be stored in a `.golden` file in `testdata/golden/`. Tests will compare the actual output against these golden files to ensure correctness.
 -   **Test Structure:** Tests will be placed alongside the code they are testing (e.g., `pkg/handlers/generate_test.go`).

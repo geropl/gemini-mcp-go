@@ -138,6 +138,9 @@ Successfully configured Cline.
 			defer func() { userHomeDir = "" }()
 
 			// Set up the environment
+			originalKey := os.Getenv("GEMINI_API_KEY")
+			os.Unsetenv("GEMINI_API_KEY")
+
 			originalEnv := make(map[string]string)
 			for k, v := range tc.env {
 				originalEnv[k] = os.Getenv(k)
@@ -147,6 +150,7 @@ Successfully configured Cline.
 				for k, v := range originalEnv {
 					os.Setenv(k, v)
 				}
+				os.Setenv("GEMINI_API_KEY", originalKey)
 			}()
 
 			// Create initial files

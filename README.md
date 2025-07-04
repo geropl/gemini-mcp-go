@@ -1,67 +1,132 @@
 # Gemini MCP Go
 
-This project is a Go implementation of an MCP server for Google's Gemini API. It acts as a bridge between an MCP client and the Gemini API, allowing AI assistants and other tools to interact with Gemini in a standardized way.
+A powerful, stateful MCP server for Google's Gemini API, implemented in Go. It allows an MCP client to have complex, multi-turn conversations with Gemini, including attaching files and maintaining context across multiple requests.
 
-## Features
+This project is a Go reimplementation and enhancement of the concepts found in the `mcp-gemini-assistant` Python project.
 
--   **Gemini Integration:** Provides access to the Gemini API for content generation and streaming.
--   **MCP Compliant:** Implements the Model Context Protocol for seamless integration with MCP clients.
--   **Easy to Use:** Includes a `setup` command to help with initial configuration.
--   **Health Check:** Provides a `/health` endpoint for monitoring the server's status.
+## Key Features
+
+-   **Session Management**: Maintain conversation context across multiple queries using session IDs.
+-   **File Attachments**: Read and include local code files in conversations. The server handles uploading files to the Gemini API.
+-   **Context Caching**: Code context and file content are cached per session, reducing token usage on follow-up questions.
+-   **Automatic Cleanup**: Sessions automatically expire after 1 hour of inactivity, and all associated uploaded files are deleted from the Gemini API to save space.
+-   **Parallel Conversations**: The server can handle multiple, independent sessions at once.
 
 ## Installation
 
-To install the Gemini MCP server, you need to have Go installed on your system. You can then clone this repository and build the server using the following commands:
-
-```bash
-git clone https://github.com/geropl/gemini-mcp-go.git
-cd gemini-mcp-go
-go build
-```
+1.  Ensure you have Go (1.21 or later) installed.
+2.  Clone this repository:
+    ```bash
+    git clone https://github.com/geropl/gemini-mcp-go.git
+    cd gemini-mcp-go
+    ```
+3.  Build the server:
+    ```bash
+    go build -o gemini-mcp-go .
+    ```
 
 ## Usage
 
-### Setup
+### 1. Set API Key
 
-Before you can use the server, you need to set your Gemini API key as an environment variable. You can use the `setup` command to check if the environment variable is set and to get instructions on how to set it.
+The server requires a Gemini API key. You can set it using the `setup` command, which will guide you, or by setting the environment variable directly.
 
 ```bash
+# Guided setup
 ./gemini-mcp-go setup
+
+# Or set it directly
+export GEMINI_API_KEY="your-gemini-api-key-here"
 ```
 
-### Serve
+### 2. Start the Server
 
-To start the server, use the `serve` command. You **must** set the `GEMINI_API_KEY` environment variable before running the server.
+Run the `serve` command to start the MCP server.
 
 ```bash
-export GEMINI_API_KEY=YOUR_API_KEY
 ./gemini-mcp-go serve
+```
+
+The server will start and listen for requests from an MCP client on stdin/stdout.
+
+## Tools Available
+
+### 1. `consult_gemini`
+
+Start or continue a conversation with Gemini. This is the primary tool for interacting with the server.
+
+**Parameters:**
+
+-   `session_id` (string, optional): The ID of a previous session to continue the conversation. If omitted, a new session is created.
+-   `problem_description` (string, required for new sessions): A detailed description of the coding problem.
+-   `code_context` (string, optional): A block of code relevant to the problem. This is cached for the session.
+-   `attached_files` (array of strings, optional): A list of absolute file paths to read from the local filesystem and attach to the conversation.
+-   `file_descriptions` (object, optional): A map where keys are file paths (matching those in `attached_files`) and values are descriptions of the files.
+-   `specific_question` (string, required): The specific question you want to ask Gemini.
+-   `additional_context` (string, optional): Any new information, updates, or changes since the last question in the session.
+-   `preferred_approach` (string, optional): The type of help needed (e.g., "solution", "review", "debug", "optimize", "explain", "follow-up").
+
+### 2. `list_sessions`
+
+List all active consultation sessions currently managed by the server.
+
+### 3. `end_session`
+
+End a specific session to free up memory and delete any associated files uploaded to the Gemini API.
+
+**Parameters:**
+
+-   `session_id` (string, required): The ID of the session to terminate.
+
+## Example Workflow
+
+**1. Start a new conversation with file attachments:**
+
+An MCP client would send a `call` request for the `consult_gemini` tool with parameters like:
+
+```json
+{
+  "problem_description": "I need to optimize this React component for performance",
+  "attached_files": [
+    "/path/to/src/components/Dashboard.jsx",
+    "/path/to/src/hooks/useData.js"
+  ],
+  "file_descriptions": {
+    "/path/to/src/components/Dashboard.jsx": "Main dashboard component with performance issues",
+    "/path/to/src/hooks/useData.js": "Custom hook for data fetching"
+  },
+  "specific_question": "How can I improve the rendering performance of this dashboard?",
+  "preferred_approach": "optimize"
+}
+```
+
+The server's response will include a `session_id`.
+
+**2. Ask a follow-up question:**
+
+Using the `session_id` from the previous response:
+
+```json
+{
+  "session_id": "abc-123-def-456",
+  "specific_question": "I implemented your suggestion, but now I'm getting stale data issues. How do I handle cache invalidation?",
+  "additional_context": "Added the LRU cache as suggested, but users see old data after updates."
+}
+```
+
+**3. End the conversation:**
+
+Once the problem is solved, end the session to clean up resources.
+
+```json
+{
+  "session_id": "abc-123-def-456"
+}
 ```
 
 ## Testing
 
-To run the tests, use the following command:
+To run the project's tests, use the following command:
 
 ```bash
 go test ./...
-```
-
-## Release Process
-
-The project uses GitHub Actions for automated testing and releases:
-
-1. All pushes to the main branch and pull requests are automatically tested.
-2. When a tag matching the pattern `v*` (e.g., `v1.0.0`) is pushed, a new release is automatically created.
-3. Binaries for Linux, macOS, and Windows are built and attached to the release.
-
-To create a new release:
-
-1. Update the version in the source code (if applicable).
-2. Commit the changes.
-3. Create and push a tag matching the version:
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-The GitHub Actions workflow will automatically create a release with the appropriate binaries.

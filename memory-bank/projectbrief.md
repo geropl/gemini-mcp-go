@@ -17,7 +17,9 @@ This project will leverage the architecture, patterns, and best practices from t
 
 ## Scope
 
--   Implement `initialize`, `generate`, `stream`, and `cancel` MCP methods.
+-   Implement a stateful, session-based architecture.
+-   Implement the `consult_gemini` tool for complex, multi-turn conversations with file attachment support.
+-   Implement the `list_sessions` and `end_session` tools for session management.
 -   Create a `serve` command to run the server.
 -   Create a `setup` command for easy installation.
 -   Develop a suite of tests with high coverage.
