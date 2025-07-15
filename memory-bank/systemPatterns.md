@@ -2,7 +2,7 @@
 
 ## High-Level Architecture
 
-The `gemini-mcp-go` server will follow a modular, layered architecture inspired by `linear-mcp-go`. This design promotes separation of concerns, making the application easier to understand, test, and maintain.
+The `gemini-mcp-go` server implements a stateful, session-based architecture for complex multi-turn conversations with Google's Gemini API.
 
 ```mermaid
 graph TD
@@ -12,55 +12,71 @@ graph TD
         C -- Manages --> SM{Session Manager (pkg/session)}
         C -- MCP Requests --> D{Handlers (pkg/handlers)}
         D -- Uses --> SM
-        SM -- Manages --> S[Sessions]
-        SM -- Gemini API Calls --> E{Gemini Client (pkg/gemini)}
-        C -- Manages --> F[mcp-go library]
+        SM -- Manages --> S[Sessions with Chat History]
+        SM -- File Processing --> F[File Upload & Management]
+        SM -- Gemini API --> G[generative-ai-go client]
+        C -- Protocol --> H[mcp-go library]
     end
 
-    E -- HTTP Requests --> G[Google Gemini API]
-    F -- Stdin/Stdout --> H[AI Assistant]
-
-    subgraph "Testing"
-        I[Tests] --> G
-        I -- Compares against --> K[Golden Files]
+    subgraph "External Dependencies"
+        I[Google Gemini API]
+        J[MCP Client (e.g., Claude Desktop)]
+        K[Local File System]
     end
+
+    G --> I
+    J --> C
+    F --> K
 ```
 
 ## Key Architectural Patterns
 
-### 1. Command-Line Interface (CLI) with Cobra
+### 1. Session-Based State Management
 
--   **`cmd` Package:** All CLI-related code will reside in the `cmd/` directory.
--   **`root.go`:** This file will define the root command.
--   **`serve.go` & `setup.go`:** Each subcommand (`serve`, `setup`) will have its own file, promoting a clean and organized command structure.
+-   **Persistent Conversations:** Each session maintains chat history and context across multiple queries.
+-   **File Context Caching:** Uploaded files are cached per session to reduce token usage on follow-up questions.
+-   **Automatic Cleanup:** Sessions expire after 1 hour of inactivity, with automatic file deletion from Gemini API.
 
-### 2. Modular Packages (`pkg`)
+### 2. Modular Package Structure
 
--   **`pkg/server`:** This package will contain the core `Server` struct, responsible for:
-    -   Initializing the `mcp-go` session.
-    -   Managing the server lifecycle (startup, shutdown).
-    -   Routing incoming MCP requests to the appropriate handlers.
-    -   Implementing the `/health` check endpoint.
--   **`pkg/handlers`:** This package will implement the business logic for each MCP method.
-    -   Each handler (e.g., `handleGenerate`, `handleStream`) will be responsible for a single MCP method.
-    -   Handlers will be stateless and receive all necessary context from the `Server`.
--   **`pkg/session`:** This package contains the logic for managing stateful conversations.
-    -   The `Manager` struct handles session creation, cleanup, and file processing.
-    -   The `Session` struct holds the state for a single conversation, including the chat history and uploaded files.
-    -   It abstracts away the details of the `generative-ai-go` library for chat and file management.
+-   **`cmd`:** Command-line interface using Cobra framework.
+    -   `root.go` defines the root command and global flags.
+    -   `serve.go` starts the MCP server with session management.
+    -   `setup.go` provides guided configuration for AI assistant integration.
 
--   **Golden Files:** For each test case, the expected output will be stored in a `.golden` file in `testdata/golden/`. Tests will compare the actual output against these golden files to ensure correctness.
--   **Test Structure:** Tests will be placed alongside the code they are testing (e.g., `pkg/handlers/generate_test.go`).
+-   **`pkg/server`:** Core MCP server implementation.
+    -   Integrates with `mcp-go` library for protocol handling.
+    -   Manages server lifecycle and tool registration.
+    -   Provides health check endpoint.
 
-### 4. Configuration Management
+-   **`pkg/session`:** Stateful conversation management.
+    -   `Manager` handles session lifecycle, cleanup, and file processing.
+    -   `Session` maintains conversation state and chat history.
+    -   Thread-safe operations with proper locking.
 
--   **Environment Variables:** Sensitive information like the `GEMINI_API_KEY` will be loaded from the environment.
--   **Command-Line Flags:** Non-sensitive configuration options will be exposed as flags on the `serve` and `setup` commands.
+-   **`pkg/handlers`:** Business logic for MCP tools.
+    -   `consult_gemini.go` implements the primary conversation tool.
+    -   `session_tools.go` implements session management tools.
+    -   Stateless handlers that use session manager for persistence.
 
-### 5. CI/CD with GitHub Actions
+### 3. Resource Management
 
--   **Workflow Automation:** The project uses GitHub Actions to automate the build, test, and release process.
--   **Continuous Integration:** Every push to `main` or pull request triggers a workflow that builds the application and runs the test suite.
--   **Automated Releases:** When a version tag (e.g., `v1.0.1`) is pushed, the workflow automatically builds binaries for Linux, macOS, and Windows, and creates a new GitHub release with these binaries as attachments.
+-   **File Upload Lifecycle:** Files are uploaded to Gemini API, tracked per session, and automatically deleted on cleanup.
+-   **Memory Management:** Sessions are stored in memory with TTL-based expiration.
+-   **Concurrent Safety:** Thread-safe session operations for handling multiple simultaneous conversations.
 
-This architecture provides a solid foundation for building a high-quality, production-ready MCP server.
+### 4. Testing Strategy
+
+-   **Unit Tests:** Comprehensive tests for session manager with mocked Gemini client implemented.
+-   **Mock Infrastructure:** Complete mock implementation for Gemini API client operations.
+-   **Dependency Injection:** Session manager is injected into handlers for testability.
+-   **Concurrency Testing:** Thread safety verified with concurrent access patterns.
+-   **Clean Test Foundation:** Existing integration tests removed, new foundation prepared.
+
+### 5. Configuration Management
+
+-   **Environment Variables:** `GEMINI_API_KEY` loaded from environment.
+-   **Guided Setup:** Interactive setup command for AI assistant configuration.
+-   **Multiple AI Assistant Support:** Configuration for Cline, Claude Code, and Roo Code.
+
+This architecture provides a robust foundation for stateful AI conversations with proper resource management and scalability.

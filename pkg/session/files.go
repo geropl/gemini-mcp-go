@@ -14,6 +14,7 @@ import (
 )
 
 var mimeTypeMap = map[string]string{
+	".go":    "text/x-go",
 	".jsx":   "text/javascript",
 	".tsx":   "text/typescript",
 	".ts":    "text/typescript",

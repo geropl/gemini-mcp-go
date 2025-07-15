@@ -100,7 +100,7 @@ An MCP client would send a `call` request for the `consult_gemini` tool with par
 }
 ```
 
-The server's response will include a `session_id`.
+The server's response will include a `session_id` for continuing the conversation.
 
 **2. Ask a follow-up question:**
 
@@ -114,15 +114,45 @@ Using the `session_id` from the previous response:
 }
 ```
 
-**3. End the conversation:**
+**3. List active sessions:**
 
-Once the problem is solved, end the session to clean up resources.
+To see all current conversations:
+
+```json
+{}
+```
+
+This returns information about all active sessions including their IDs, creation times, and message counts.
+
+**4. End the conversation:**
+
+Once the problem is solved, end the session to clean up resources:
 
 ```json
 {
   "session_id": "abc-123-def-456"
 }
 ```
+
+This will delete any uploaded files from the Gemini API and free up memory.
+
+## Session Management
+
+### Automatic Cleanup
+- Sessions automatically expire after **1 hour** of inactivity
+- Expired sessions and their uploaded files are automatically deleted
+- A background cleanup routine runs every 5 minutes to remove expired sessions
+
+### File Handling
+- Files are uploaded to the Gemini API when first referenced in a session
+- File content is cached per session to reduce token usage on follow-up questions
+- Files are automatically deleted from the Gemini API when sessions end or expire
+- Supported file types include most common programming languages and text formats
+
+### Concurrent Sessions
+- The server can handle multiple independent sessions simultaneously
+- Each session maintains its own conversation context and file cache
+- Thread-safe operations ensure data consistency across concurrent requests
 
 ## Testing
 

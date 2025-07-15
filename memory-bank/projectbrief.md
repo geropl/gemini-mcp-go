@@ -2,25 +2,23 @@
 
 ## Objective
 
-The primary goal of this project is to reimplement the `mcp-server-gemini` project in Go, creating a new MCP server named `gemini-mcp-go`.
-
-This project will leverage the architecture, patterns, and best practices from the existing `linear-mcp-go` project to ensure the new server is robust, maintainable, and testable.
+Create a powerful, stateful MCP server for Google's Gemini API that enables complex, multi-turn conversations with file attachment support. This is a Go reimplementation and enhancement of the `mcp-gemini-assistant` Python project.
 
 ## Key Requirements
 
-1.  **Functionality:** The new server must replicate the core functionality of `mcp-server-gemini`, acting as a bridge between an MCP client and the Google Gemini API.
-2.  **Technology:** The server will be built in Go, using the `mcp-go` library for the core MCP implementation.
-3.  **Architecture:** The project will adopt the modular structure of `linear-mcp-go`, with distinct packages for command-line handling (`cmd`), core application logic (`pkg`), and test data (`testdata`).
-4.  **Testing:** A comprehensive testing strategy will be implemented using golden files for output validation, mirroring the approach in `linear-mcp-go`.
-5.  **Configuration:** The server will be configurable via environment variables and command-line flags, particularly for the `GEMINI_API_KEY`.
-6.  **User Experience:** The server will include a `setup` command to simplify installation and configuration for end-users.
+1.  **Stateful Architecture:** Session-based conversation management with context persistence across multiple queries.
+2.  **File Integration:** Support for reading and attaching local code files to conversations, with automatic upload to Gemini API.
+3.  **Session Management:** Automatic cleanup, TTL-based expiration, and resource management for uploaded files.
+4.  **Technology:** Built in Go using the `mcp-go` library and `generative-ai-go` for Gemini integration.
+5.  **Testing:** Comprehensive unit tests for session management with mocked dependencies.
+6.  **Configuration:** Environment variable and command-line configuration, with guided setup command.
+7.  **User Experience:** Simple installation and configuration process for AI assistant integration.
 
 ## Scope
 
--   Implement a stateful, session-based architecture.
--   Implement the `consult_gemini` tool for complex, multi-turn conversations with file attachment support.
--   Implement the `list_sessions` and `end_session` tools for session management.
--   Create a `serve` command to run the server.
--   Create a `setup` command for easy installation.
--   Develop a suite of tests with high coverage.
--   Document the project in a `README.md` and maintain a `memory-bank` for development tracking.
+-   **Core Architecture**: Stateful, session-based MCP server with conversation context management.
+-   **Primary Tool**: `consult_gemini` for complex, multi-turn conversations with file attachment support.
+-   **Session Management**: `list_sessions` and `end_session` tools for managing active conversations.
+-   **Commands**: `serve` command to run the server, `setup` command for easy installation.
+-   **Testing**: Comprehensive unit tests for session management, clean foundation for integration tests.
+-   **Documentation**: Complete documentation reflecting the new stateful architecture.
